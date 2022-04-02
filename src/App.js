@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 // Material UI Imports
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import {CssBaseline} from "@material-ui/core";
+import { MuiThemeProvider } from '@material-ui/core/styles';
+import { createTheme, CssBaseline } from "@material-ui/core";
 
 // Component Imports
 import AppBar from "./components/AppBar";
@@ -17,52 +17,38 @@ import TestPage from "./components/pages/TestPage";
 import SettingsPage from "./components/pages/SettingsPage";
 
 // Action Imports
-import {setSettings} from "./actions/settings-actions";
+import { setSettings } from "./actions/settings-actions";
 
 // Local Storage Operations
-import {getLocalSettings,setLocalSettings} from "./services/settingsOperations";
+import { getLocalSettings, setLocalSettings } from "./services/settingsOperations";
 
-class App extends Component {
+const App = () => {
+  const dispatch = useDispatch()
+  const { settings } = useSelector((state) => state)
+  const theme = createTheme(settings)
 
-  constructor(props) {
-    super(props);
-
-    // Settings init
-    let settings = getLocalSettings();
-    if (settings===null || settings===undefined)
-      setLocalSettings(this.props.settings);
+  useEffect(() => {
+    let localSettings = getLocalSettings();
+    if (localSettings === null || localSettings === undefined)
+      setLocalSettings(settings);
     else
-      this.props.setSettings(settings);
+      dispatch(setSettings(localSettings));
+  }, [])
 
-  }
-
-  render() {
-
-    const theme = createMuiTheme(this.props.settings);
-
-    return (
-        <MuiThemeProvider theme={theme}>
-          <CssBaseline/>
-          <Router>
-            <AppBar/>
-              <Switch>
-                <Route path={"/"} exact /*strict*/ component={HomePage}/>
-                <Route path={"/test"} exact /*strict*/ component={TestPage}/>
-                <Route path={"/settings"} exact /*strict*/ component={SettingsPage}/>
-                <Route exact /*strict*/ component={NoPageFound}/>
-              </Switch>
-          </Router>
-        </MuiThemeProvider>
-    );
-  }
+  return (
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <AppBar />
+        <Routes>
+          <Route path={"/"} element={<HomePage />} />
+          <Route path={"/test"} element={<TestPage />} />
+          <Route path={"/settings"} element={<SettingsPage />} />
+          <Route element={<NoPageFound />} />
+        </Routes>
+      </Router>
+    </MuiThemeProvider>
+  )
 }
 
-const mapStateToProps = (state, props) => {
-  return {...state,...props};
-};
-
-const mapDispatchToProps = {
-  setSettings
-};
-
-export default connect(mapStateToProps,mapDispatchToProps)(App);
+export default App;

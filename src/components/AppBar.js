@@ -1,18 +1,19 @@
-import React, {Component} from 'react';
+import React, { Component, useState } from 'react';
+import { makeStyles } from '@material-ui/core'
 import AppBarMUI from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 
 import Button from '@material-ui/core/Button';
-//import AccountCircle from '@material-ui/icons/AccountCircle';
+//import AccountCircle from '@mui/icons-material/AccountCircle';
 //import Badge from '@material-ui/core/Badge';
-//import NotificationsIcon from '@material-ui/icons/Notifications';
+//import NotificationsIcon from '@mui/icons-material/Notifications';
 
 
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 import TemporaryDrawer from "./TemporaryDrawer";
@@ -37,45 +38,35 @@ const styles = theme => ({
 
 
 });
+const useStyles = makeStyles(styles)
 
-class AppBar extends Component {
+const AppBar = () => {
+    const classes = useStyles()
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-    state={
-        isDrawerOpen:false,
+    const toggleDrawer = (open) => () => {
+        setIsDrawerOpen(open)
     };
 
-    toggleDrawer = (open) => () => {
-        this.setState({
-            isDrawerOpen: open,
-        });
-    };
+    return (
+        <div className={classes.root}>
+            <AppBarMUI position="static">
+                <Toolbar>
+                    <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={toggleDrawer(true)}>
+                        <MenuIcon />
+                    </IconButton>
 
-    render() {
-
-        const { classes } = this.props;
-
-        return (
-            <div className={classes.root}>
-                <AppBarMUI position="static">
-                    <Toolbar>
-                        <IconButton className={classes.menuButton} color="inherit" aria-label="Menu" onClick={this.toggleDrawer(true)}>
-                            <MenuIcon />
-                        </IconButton>
-
-                            <Typography variant="h6" color="inherit" className={classes.grow}>
-                                <Link to={"/"} style={{all:"unset"}}>{"Material-UI Starter"}</Link>
-                            </Typography>
-
-                        <Button color="inherit">Login</Button>
-                    </Toolbar>
-                </AppBarMUI>
-                <TemporaryDrawer
-                    isDrawerOpen={this.state.isDrawerOpen}
-                    toggleDrawer={this.toggleDrawer}
-                />
-            </div>
-        );
-    }
+                    <Typography variant="h6" color="inherit" className={classes.grow}>
+                        <Link to={"/"} style={{ all: "unset" }}>{"Material-UI Starter"}</Link>
+                    </Typography>
+                </Toolbar>
+            </AppBarMUI>
+            <TemporaryDrawer
+                isDrawerOpen={isDrawerOpen}
+                toggleDrawer={toggleDrawer}
+            />
+        </div>
+    )
 }
 
-export default withStyles(styles)(AppBar);
+export default AppBar
